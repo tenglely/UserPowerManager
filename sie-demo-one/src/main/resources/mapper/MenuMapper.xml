@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.teng.siedemo.dao.MenuMapper" >
+  <resultMap id="BaseResultMap" type="com.teng.siedemo.entity.Menu" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="menu_contents" property="menuContents" jdbcType="SMALLINT" />
+    <result column="parent_menu" property="parentMenu" jdbcType="BIGINT" />
+    <result column="menu_name" property="menuName" jdbcType="VARCHAR" />
+    <result column="menu_identification" property="menuIdentification" jdbcType="VARCHAR" />
+    <result column="menu_url" property="menuUrl" jdbcType="VARCHAR" />
+    <result column="menu_photo" property="menuPhoto" jdbcType="VARCHAR" />
+    <result column="sort_num" property="sortNum" jdbcType="BIGINT" />
+    <result column="menu_status" property="menuStatus" jdbcType="SMALLINT" />
+    <result column="menu_remarks" property="menuRemarks" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <resultMap id="MenuTreeResultMap" type="com.teng.siedemo.entity.vo.MenuTree" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="menu_name" property="label" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="queryHasMenu" resultMap="BaseResultMap">
+    select sm.*
+    from sie_menu sm
+    join sie_role_power srp on srp.menu_id = sm.id
+    join sie_role sr on sr.id = srp.role_id
+    where sr.id = #{roleId}
+    and sm.menu_status = 1
+    and sr.role_status = 1
+    and sr.start_time <![CDATA[ <= ]]> #{nowtime}
+    and sr.over_time <![CDATA[ >= ]]> #{nowtime}
+  </select>
+
+  <select id="queryMenuByContents" resultMap="BaseResultMap">
+    select *
+    from sie_menu sm
+    where sm.menu_contents = #{menuContents}
+    order by sm.sort_num
+  </select>
+
+  <select id="queryMenuTreeByContents" resultMap="MenuTreeResultMap">
+    select *
+    from sie_menu sm
+    where sm.menu_contents = #{contents}
+    and sm.menu_status = 1
+    order by sm.sort_num
+  </select>
+
+  <select id="queryMenuTreeByParentAndContents" resultMap="MenuTreeResultMap">
+    select *
+    from sie_menu sm
+    where sm.parent_menu = #{parentMenu}
+    and sm.menu_contents = #{contents}
+    and sm.menu_status = 1
+    order by sm.sort_num
+  </select>
+
+  <select id="queryMenuPage" resultMap="BaseResultMap">
+    select *
+    from sie_menu sm
+    <trim prefix="where" prefixOverrides="and|or">
+      <if test="menu != null">
+        <if test="menu.menuName != null and menu.menuName != ''">
+          and sm.menu_name like concat("%", #{menu.menuName}, "%")
+        </if>
+        <if test="menu.menuStatus != null and menu.menuStatus != ''">
+          and sm.menu_status = #{menu.menuStatus}
+        </if>
+        <if test="menu.menuContents != null and menu.menuContents != ''">
+          and sm.menu_contents = #{menu.menuContents}
+        </if>
+      </if>
+    </trim>
+    order by sm.id desc
+    limit #{start},#{pageSize}
+  </select>
+
+  <select id="countMenu" resultType="java.lang.Integer">
+    select count(*)
+    from sie_menu sm
+    <trim prefix="where" prefixOverrides="and|or">
+      <if test="menu != null">
+        <if test="menu.menuName != null and menu.menuName != ''">
+          and sm.menu_name like concat("%", #{menu.menuName}, "%")
+        </if>
+        <if test="menu.menuStatus != null and menu.menuStatus != ''">
+          and sm.menu_status = #{menu.menuStatus}
+        </if>
+        <if test="menu.menuContents != null and menu.menuContents != ''">
+          and sm.menu_contents = #{menu.menuContents}
+        </if>
+      </if>
+    </trim>
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sie_menu
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insertSelective" parameterType="com.teng.siedemo.entity.Menu" >
+    insert into sie_menu
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="menuContents != null" >
+        menu_contents,
+      </if>
+      <if test="parentMenu != null" >
+        parent_menu,
+      </if>
+      <if test="menuName != null" >
+        menu_name,
+      </if>
+      <if test="menuIdentification != null" >
+        menu_identification,
+      </if>
+      <if test="menuUrl != null" >
+        menu_url,
+      </if>
+      <if test="menuPhoto != null" >
+        menu_photo,
+      </if>
+      <if test="sortNum != null" >
+        sort_num,
+      </if>
+      <if test="menuStatus != null" >
+        menu_status,
+      </if>
+      <if test="menuRemarks != null" >
+        menu_remarks,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="menuContents != null" >
+        #{menuContents,jdbcType=SMALLINT},
+      </if>
+      <if test="parentMenu != null" >
+        #{parentMenu,jdbcType=BIGINT},
+      </if>
+      <if test="menuName != null" >
+        #{menuName,jdbcType=VARCHAR},
+      </if>
+      <if test="menuIdentification != null" >
+        #{menuIdentification,jdbcType=VARCHAR},
+      </if>
+      <if test="menuUrl != null" >
+        #{menuUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="menuPhoto != null" >
+        #{menuPhoto,jdbcType=VARCHAR},
+      </if>
+      <if test="sortNum != null" >
+        #{sortNum,jdbcType=BIGINT},
+      </if>
+      <if test="menuStatus != null" >
+        #{menuStatus,jdbcType=SMALLINT},
+      </if>
+      <if test="menuRemarks != null" >
+        #{menuRemarks,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.teng.siedemo.entity.Menu" >
+    update sie_menu
+    <set >
+      <if test="menuContents != null" >
+        menu_contents = #{menuContents,jdbcType=SMALLINT},
+      </if>
+      <if test="parentMenu != null" >
+        parent_menu = #{parentMenu,jdbcType=BIGINT},
+      </if>
+      <if test="menuName != null" >
+        menu_name = #{menuName,jdbcType=VARCHAR},
+      </if>
+      <if test="menuIdentification != null" >
+        menu_identification = #{menuIdentification,jdbcType=VARCHAR},
+      </if>
+      <if test="menuUrl != null" >
+        menu_url = #{menuUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="menuPhoto != null" >
+        menu_photo = #{menuPhoto,jdbcType=VARCHAR},
+      </if>
+      <if test="sortNum != null" >
+        sort_num = #{sortNum,jdbcType=BIGINT},
+      </if>
+      <if test="menuStatus != null" >
+        menu_status = #{menuStatus,jdbcType=SMALLINT},
+      </if>
+      <if test="menuRemarks != null" >
+        menu_remarks = #{menuRemarks,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+</mapper>

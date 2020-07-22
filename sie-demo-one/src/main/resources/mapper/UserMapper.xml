@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.teng.siedemo.dao.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.teng.siedemo.entity.User" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="VARCHAR" />
+    <result column="user_phone" property="userPhone" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="user_status" property="userStatus" jdbcType="SMALLINT" />
+    <result column="user_remarks" property="userRemarks" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <select id="queryUserPage" resultMap="BaseResultMap">
+      select *
+      from sie_user su
+      <trim prefix="where" prefixOverrides="and|or">
+        <if test="user != null">
+          <if test="user.username != null and user.username != ''">
+            and su.username like concat("%", #{user.username}, "%")
+          </if>
+          <if test="user.name != null and user.name != ''">
+            and su.name like concat("%", #{user.name}, "%")
+          </if>
+          <if test="user.userStatus != null and user.userStatus != ''">
+            and su.user_status = #{user.userStatus}
+          </if>
+          <if test="startTime != null and startTime != '' and overTime != null and overTime != ''">
+            and su.create_time <![CDATA[ >= ]]> #{startTime} and su.create_time <![CDATA[ <= ]]>  #{overTime}
+          </if>
+        </if>
+      </trim>
+    order by su.id desc
+    limit #{start},#{pageSize}
+  </select>
+
+  <select id="countUser" resultType="java.lang.Integer">
+    select count(*)
+    from sie_user su
+    <trim prefix="where" prefixOverrides="and|or">
+      <if test="user != null">
+        <if test="user.username != null and user.username != ''">
+          and su.username like concat("%", #{user.username}, "%")
+        </if>
+        <if test="user.name != null and user.name != ''">
+          and su.name like concat("%", #{user.name}, "%")
+        </if>
+        <if test="user.userStatus != null and user.userStatus != ''">
+          and su.user_status = #{user.userStatus}
+        </if>
+        <if test="startTime != null and startTime != '' and overTime != null and overTime != ''">
+          and su.create_time <![CDATA[ >= ]]> #{startTime} and su.create_time <![CDATA[ <= ]]>  #{overTime}
+        </if>
+      </if>
+    </trim>
+  </select>
+
+  <select id="userlogin" resultMap="BaseResultMap">
+    select su.*
+    from sie_user su
+    where su.username = #{username}
+    and su.user_status = 1
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sie_user
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.teng.siedemo.entity.User" >
+    insert into
+    sie_user (id, username,name,password,sex,user_phone,email,user_status,user_remarks,create_time,,update_time,)
+    values (#{id,jdbcType=BIGINT},#{username,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},
+    #{password,jdbcType=VARCHAR},#{sex,jdbcType=VARCHAR}, #{userPhone,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},
+    #{userStatus,jdbcType=SMALLINT},#{userRemarks,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP},  #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.teng.siedemo.entity.User" >
+    insert into sie_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="userPhone != null" >
+        user_phone,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="userStatus != null" >
+        user_status,
+      </if>
+      <if test="userRemarks != null" >
+        user_remarks,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="userPhone != null" >
+        #{userPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="userStatus != null" >
+        #{userStatus,jdbcType=SMALLINT},
+      </if>
+      <if test="userRemarks != null" >
+        #{userRemarks,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.teng.siedemo.entity.User" >
+    update sie_user
+    <set >
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="userPhone != null" >
+        user_phone = #{userPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="userStatus != null" >
+        user_status = #{userStatus,jdbcType=SMALLINT},
+      </if>
+      <if test="userRemarks != null" >
+        user_remarks = #{userRemarks,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+</mapper>
